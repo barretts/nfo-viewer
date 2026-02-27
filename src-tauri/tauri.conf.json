@@ -1,0 +1,66 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-config-schema/schema.json",
+  "productName": "nfo-viewer",
+  "version": "1.0.0",
+  "identifier": "com.nfo-viewer.app",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "title": "nfo-viewer",
+    "windows": [
+      {
+        "title": "nfo-viewer",
+        "width": 900,
+        "height": 700,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "fileAssociations": [
+      {
+        "ext": ["nfo"],
+        "mimeType": "text/x-nfo",
+        "description": "NFO File",
+        "role": "Viewer"
+      },
+      {
+        "ext": ["diz"],
+        "mimeType": "text/plain",
+        "description": "DIZ File",
+        "role": "Viewer"
+      }
+    ]
+  },
+  "plugins": {
+    "cli": {
+      "args": [
+        {
+          "name": "file",
+          "index": 1,
+          "takesValue": true
+        }
+      ]
+    },
+    "fs": {
+      "scope": ["**"]
+    }
+  }
+}
