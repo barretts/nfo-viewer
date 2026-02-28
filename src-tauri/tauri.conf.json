@@ -10,7 +10,6 @@
     "beforeBuildCommand": "npm run build"
   },
   "app": {
-    "title": "nfo-viewer",
     "windows": [
       {
         "title": "nfo-viewer",
