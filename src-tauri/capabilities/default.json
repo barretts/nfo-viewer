@@ -1,0 +1,16 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default capabilities for nfo-viewer",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "fs:default",
+    "fs:allow-read-file",
+    "fs:read-all",
+    "dialog:default",
+    "dialog:allow-open",
+    "cli:default",
+    "cli:allow-cli-matches"
+  ]
+}

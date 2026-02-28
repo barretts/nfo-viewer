@@ -22,7 +22,6 @@ const NfoRenderer: React.FC<NfoRendererProps> = ({ doc, theme, zoom, renderMode 
   const containerRef = useRef<HTMLDivElement>(null);
 
   const fontSize = Math.round(14 * zoom);
-  const lineHeight = Math.round(fontSize * 1.2);
 
   const renderLine = useCallback(
     (line: string, lineIndex: number) => {
@@ -30,7 +29,7 @@ const NfoRenderer: React.FC<NfoRendererProps> = ({ doc, theme, zoom, renderMode 
         return (
           <div
             key={lineIndex}
-            style={{ height: lineHeight, whiteSpace: 'pre' }}
+            style={{ whiteSpace: 'pre' }}
           >
             {line || ' '}
           </div>
@@ -70,13 +69,13 @@ const NfoRenderer: React.FC<NfoRendererProps> = ({ doc, theme, zoom, renderMode 
       return (
         <div
           key={lineIndex}
-          style={{ height: lineHeight, whiteSpace: 'pre' }}
+          style={{ whiteSpace: 'pre' }}
         >
           {spans.length > 0 ? spans : ' '}
         </div>
       );
     },
-    [theme, lineHeight, renderMode],
+    [theme, renderMode],
   );
 
   return (
@@ -90,7 +89,8 @@ const NfoRenderer: React.FC<NfoRendererProps> = ({ doc, theme, zoom, renderMode 
           style={{
             fontFamily: "'IBM Plex Mono', 'Cascadia Code', 'Consolas', 'Courier New', monospace",
             fontSize: `${fontSize}px`,
-            lineHeight: `${lineHeight}px`,
+            lineHeight: '1em',
+            letterSpacing: '0px',
             color: theme.fg,
             tabSize: 8,
             margin: 0,
