@@ -11,6 +11,8 @@
     "dialog:default",
     "dialog:allow-open",
     "cli:default",
-    "cli:allow-cli-matches"
+    "cli:allow-cli-matches",
+    "log:default",
+    "log:allow-log"
   ]
 }
