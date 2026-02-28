@@ -3,9 +3,9 @@
  * These are no-ops when running in the browser (non-Tauri environment).
  */
 
-import { readFile } from '@tauri-apps/plugin-fs';
+import { readFile, writeFile } from '@tauri-apps/plugin-fs';
 import { getMatches } from '@tauri-apps/plugin-cli';
-import { open } from '@tauri-apps/plugin-dialog';
+import { open, save } from '@tauri-apps/plugin-dialog';
 import { invoke } from '@tauri-apps/api/core';
 
 export function isTauri(): boolean {
@@ -71,5 +71,23 @@ export async function tauriOpenFileDialog(): Promise<string | null> {
   } catch (e) {
     console.error('[tauri] dialog failed:', e);
     return null;
+  }
+}
+
+/** Save PNG bytes to disk via Tauri save dialog */
+export async function tauriSavePng(bytes: Uint8Array, defaultName: string): Promise<boolean> {
+  if (!isTauri()) return false;
+  try {
+    const filePath = await save({
+      defaultPath: defaultName,
+      filters: [{ name: 'PNG Image', extensions: ['png'] }],
+    });
+    if (!filePath) return false;
+    await writeFile(filePath, bytes);
+    console.log('[tauri] saved PNG to:', filePath);
+    return true;
+  } catch (e) {
+    console.error('[tauri] savePng failed:', e);
+    return false;
   }
 }
