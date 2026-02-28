@@ -9,7 +9,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { invoke } from '@tauri-apps/api/core';
 
 export function isTauri(): boolean {
-  return !!(window as any).__TAURI__;
+  return !!(window as any).__TAURI_INTERNALS__;
 }
 
 /** Read a file from disk via Tauri's fs API */
