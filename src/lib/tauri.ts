@@ -26,33 +26,27 @@ export async function tauriReadFile(path: string): Promise<Uint8Array | null> {
   }
 }
 
-/** Get the file path passed as CLI argument (file association) */
-export async function tauriGetOpenFilePath(): Promise<string | null> {
+interface FileArgResult {
+  path: string;
+  name: string;
+  bytes: number[];
+}
+
+/** Get the startup file passed as CLI argument (file association).
+ *  Returns { path, name, bytes } or null. Reads the file in Rust
+ *  to bypass fs plugin scope restrictions. */
+export async function tauriGetStartupFile(): Promise<{ name: string; bytes: Uint8Array } | null> {
   if (!isTauri()) return null;
 
-  // Primary: use Rust command that reads raw process args directly
   try {
     console.log('[tauri] invoking get_file_arg...');
-    const filePath = await invoke<string | null>('get_file_arg');
-    console.log('[tauri] get_file_arg result:', filePath);
-    if (filePath) return filePath;
+    const result = await invoke<FileArgResult | null>('get_file_arg');
+    console.log('[tauri] get_file_arg result:', result ? `${result.name} (${result.bytes.length} bytes)` : 'null');
+    if (result) {
+      return { name: result.name, bytes: new Uint8Array(result.bytes) };
+    }
   } catch (e) {
     console.error('[tauri] get_file_arg failed:', e);
-  }
-
-  // Fallback: try CLI plugin
-  try {
-    console.log('[tauri] trying CLI plugin getMatches...');
-    const matches = await getMatches();
-    console.log('[tauri] CLI matches:', JSON.stringify(matches, null, 2));
-    const args = matches.args;
-    if (args['file'] && typeof args['file'].value === 'string') {
-      console.log('[tauri] file arg from CLI plugin:', args['file'].value);
-      return args['file'].value;
-    }
-    console.log('[tauri] no file arg from CLI plugin');
-  } catch (e) {
-    console.error('[tauri] getMatches failed:', e);
   }
 
   return null;

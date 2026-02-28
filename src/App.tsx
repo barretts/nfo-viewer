@@ -5,7 +5,7 @@ import DropZone from './components/DropZone';
 import AboutModal from './components/AboutModal';
 import { loadNfoFromFile } from './lib/nfo-parser';
 import { getThemeById } from './lib/themes';
-import { isTauri, tauriReadFile, tauriGetOpenFilePath, tauriOpenFileDialog } from './lib/tauri';
+import { isTauri, tauriReadFile, tauriGetStartupFile, tauriOpenFileDialog } from './lib/tauri';
 import { parseNfo } from './lib/nfo-parser';
 import type { NfoDocument } from './lib/nfo-parser';
 import type { NfoTheme } from './lib/themes';
@@ -33,15 +33,10 @@ function App() {
   // On mount, check for Tauri CLI file argument
   useEffect(() => {
     (async () => {
-      if (isTauri()) {
-        const filePath = await tauriGetOpenFilePath();
-        if (filePath) {
-          const bytes = await tauriReadFile(filePath);
-          if (bytes) {
-            const fileName = filePath.split(/[/\\]/).pop() || 'file.nfo';
-            setDoc(parseNfo(bytes, fileName));
-          }
-        }
+      const startupFile = await tauriGetStartupFile();
+      if (startupFile) {
+        console.log('[app] Loading startup file:', startupFile.name);
+        setDoc(parseNfo(startupFile.bytes, startupFile.name));
       }
     })();
   }, []);

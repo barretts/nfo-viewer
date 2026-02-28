@@ -3,20 +3,36 @@
 use log::{info, error, debug};
 use tauri::Manager;
 
+#[derive(serde::Serialize)]
+struct FileArg {
+    path: String,
+    name: String,
+    bytes: Vec<u8>,
+}
+
 #[tauri::command]
-fn get_file_arg() -> Option<String> {
+fn get_file_arg() -> Option<FileArg> {
     let args: Vec<String> = std::env::args().collect();
     debug!("get_file_arg called, raw args: {:?}", args);
-    // Skip the first arg (exe path), look for a file path
     for arg in args.iter().skip(1) {
-        // Skip flags
         if arg.starts_with('-') {
             continue;
         }
         let path = std::path::Path::new(arg);
-        if path.exists() {
+        if path.exists() && path.is_file() {
             info!("Found file arg: {}", arg);
-            return Some(arg.clone());
+            match std::fs::read(path) {
+                Ok(bytes) => {
+                    let name = path.file_name()
+                        .map(|n| n.to_string_lossy().to_string())
+                        .unwrap_or_else(|| "file.nfo".to_string());
+                    info!("Read {} bytes from {}", bytes.len(), arg);
+                    return Some(FileArg { path: arg.clone(), name, bytes });
+                }
+                Err(e) => {
+                    error!("Failed to read file {}: {}", arg, e);
+                }
+            }
         }
     }
     info!("No file arg found");
