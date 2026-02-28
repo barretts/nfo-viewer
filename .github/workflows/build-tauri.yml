@@ -42,6 +42,7 @@ jobs:
       - run: npm ci
 
       - uses: tauri-apps/tauri-action@v0
+        id: tauri
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -51,3 +52,24 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+
+      - name: Upload portable Windows exe
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nfo-viewer-portable-windows
+          path: src-tauri/target/release/nfo-viewer.exe
+
+      - name: Zip portable exe for release
+        if: matrix.platform == 'windows-latest'
+        run: Compress-Archive -Path src-tauri/target/release/nfo-viewer.exe -DestinationPath nfo-viewer-portable-windows.zip
+
+      - name: Attach portable zip to release
+        if: matrix.platform == 'windows-latest'
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          tag_name: v__VERSION__
+          files: nfo-viewer-portable-windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

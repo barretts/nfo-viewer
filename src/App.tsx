@@ -103,7 +103,7 @@ function App() {
   const handleExportPng = useCallback(() => {
     if (!doc) return;
     const fontSize = 14;
-    const lineHeight = Math.round(fontSize * 1.2);
+    const lineHeight = fontSize;
     const padding = 16;
     const charWidth = fontSize * 0.6;
 
