@@ -5,7 +5,7 @@ import DropZone from './components/DropZone';
 import AboutModal from './components/AboutModal';
 import { loadNfoFromFile } from './lib/nfo-parser';
 import { getThemeById } from './lib/themes';
-import { isTauri, tauriReadFile, tauriGetStartupFile, tauriOpenFileDialog } from './lib/tauri';
+import { isTauri, tauriReadFile, tauriGetStartupFile, tauriOpenFileDialog, tauriSavePng } from './lib/tauri';
 import { parseNfo } from './lib/nfo-parser';
 import type { NfoDocument } from './lib/nfo-parser';
 import type { NfoTheme } from './lib/themes';
@@ -132,14 +132,22 @@ function App() {
       }
     });
 
-    canvas.toBlob((blob) => {
+    const defaultName = (doc.fileName.replace(/\.[^.]+$/, '') || 'nfo') + '.png';
+
+    canvas.toBlob(async (blob) => {
       if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = (doc.fileName.replace(/\.[^.]+$/, '') || 'nfo') + '.png';
-      a.click();
-      URL.revokeObjectURL(url);
+
+      if (isTauri()) {
+        const arrayBuffer = await blob.arrayBuffer();
+        await tauriSavePng(new Uint8Array(arrayBuffer), defaultName);
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = defaultName;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
     }, 'image/png');
   }, [doc, theme]);
 
